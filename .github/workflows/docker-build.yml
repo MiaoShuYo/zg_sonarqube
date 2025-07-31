@@ -22,6 +22,12 @@ on:
         default: false
         type: boolean
 
+# 添加必要的权限
+permissions:
+  security-events: write
+  actions: read
+  contents: read
+
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ github.event.inputs.image_name || 'zgsonarqube' }}

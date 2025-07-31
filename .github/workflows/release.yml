@@ -10,6 +10,13 @@ on:
         required: true
         default: 'v1.0.0'
 
+# 添加必要的权限
+permissions:
+  security-events: write
+  actions: read
+  contents: read
+  packages: write
+
 env:
   REGISTRY: docker.io
   IMAGE_NAME: zgsonarqube
