@@ -41,17 +41,40 @@ docker build -f Dockerfile.simple -t sonarqube-test .
 ./gradlew :sonar-application:zip --no-daemon --parallel=false
 ```
 
-### 2. 退出代码126 - 权限问题
+### 2. 退出代码126 - 权限和换行符问题
 
 **错误信息：**
 ```
 exit code: 126
 ```
 
+**可能原因：**
+- gradlew文件没有执行权限
+- Windows和Linux换行符不匹配
+- gradlew文件损坏
+
 **解决方案：**
+
+#### 方案A：使用修复脚本
+```bash
+chmod +x scripts/fix-gradlew.sh
+./scripts/fix-gradlew.sh
+```
+
+#### 方案B：在Dockerfile中修复
 ```dockerfile
-# 在Dockerfile中添加
-RUN chmod +x ./gradlew
+# 安装dos2unix工具
+RUN apt-get update && apt-get install -y dos2unix
+
+# 修复gradlew权限和换行符
+RUN chmod +x ./gradlew && \
+    dos2unix ./gradlew 2>/dev/null || true && \
+    file ./gradlew
+```
+
+#### 方案C：使用测试Dockerfile
+```bash
+docker build -f Dockerfile.test -t sonarqube-test .
 ```
 
 ### 3. 网络超时问题
