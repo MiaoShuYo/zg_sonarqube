@@ -10,7 +10,7 @@ Warning: This run of the CodeQL Action does not have permission to access Code S
 
 ## 解决方案
 
-### 1. 添加必要的SAM权限
+### 1. 添加必要的权限
 
 在所有使用CodeQL Action的工作流文件中添加以下权限配置：
 
@@ -23,7 +23,7 @@ permissions:
 
 ### 2. 启用Code Scanning
 
-在GitHub仓库设置中启用代码扫描：
+#### 如果仓库中有"Code security and analysis"选项：
 
 1. 进入仓库设置 (Settings)
 2. 点击 "Security" → "Code security and analysis"
@@ -31,11 +31,47 @@ permissions:
 4. 选择 "GitHub Advanced Security" 或 "CodeQL"
 5. 点击 "Enable"
 
+#### 如果仓库中没有"Code security and analysis"选项：
+
+**原因分析：**
+
+1. **私有仓库 + 免费账户**：
+   - GitHub Advanced Security需要付费许可证
+   - 解决方案：升级到付费计划或使用公共仓库
+
+2. **组织设置限制**：
+   - 组织管理员可能禁用了安全功能
+   - 解决方案：联系组织管理员启用
+
+3. **仓库权限不足**：
+   - 您可能没有管理员权限
+   - 解决方案：联系仓库所有者
+
+**替代解决方案：**
+
+### 方案A：使用公共仓库
+```bash
+# 将仓库设为公共
+# 在GitHub仓库页面点击Settings → General → Danger Zone → Change repository visibility
+```
+
+### 方案B：使用GitHub App
+1. 创建GitHub App
+2. 配置必要的权限
+3. 安装到仓库
+
+### 方案C：使用Personal Access Token
+1. 生成具有`security-events`权限的PAT
+2. 在Actions中使用自定义token
+
 ### 3. 检查仓库设置
 
 确保以下TODO项目已完成：
 
-- [ ] 启用GitHub Advanced Security (如果使用企业版)
+- [ ] 确认仓库可见性（公共/私有）
+- [ ] 检查账户类型（免费/付费）
+- [ ] 验证组织设置
+- [ ] 确认用户权限
 - [ ] 配置代码扫描规则
 - [ ] 设置安全策略
 - [ ] 配置依赖扫描
@@ -63,13 +99,22 @@ permissions:
 **解决方案**: 检查仓库是否为fork，如果是fork，需要确保主仓库允许fork的Actions运行。
 
 #### 问题2: Code Scanning未启用
-**解决方案**: 联系仓库管理员启用以下权限：
-- `security-events: write`
-- `actions: read`
-- `contents: read`
+**解决方案**: 
+- 对于私有仓库：升级到GitHub Pro或Enterprise
+- 对于公共仓库：确保仓库设置为公共
+- 联系仓库管理员启用以下权限：
+  - `security-events: write`
+  - `actions: read`
+  - `contents: read`
 
 #### 问题3: API访问受限
 **解决方案**: 确保GitHub Token有足够的权限，或者使用更强的权限配置。
+
+#### 问题4: 没有"Code security and analysis"选项
+**解决方案**:
+1. 检查账户类型和仓库可见性
+2. 联系GitHub支持
+3. 使用替代方案（如上述方案A、B、C）
 
 ### 7. 最佳实践
 
@@ -77,9 +122,12 @@ permissions:
 2. **定期更新Action版本**: 使用最新的CodeQL Action版本
 3. **监控安全扫描结果**: 定期检查Security tab中的扫描结果
 4. **配置通知**: 设置安全漏洞通知
+5. **备份安全策略**: 创建安全策略文件
 
 ### 8. 相关链接
 
 - [GitHub Code Scanning文档](https://docs.github.com/en/code-security/code-scanning)
 - [CodeQL Action文档](https://github.com/github/codeql-action)
 - [GitHub Actions权限文档](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token)
+- [GitHub Advanced Security文档](https://docs.github.com/en/github/getting-started-with-github/learning-about-github/about-github-advanced-security)
+- [GitHub Pricing](https://github.com/pricing)
