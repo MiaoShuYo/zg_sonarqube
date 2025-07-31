@@ -1,18 +1,18 @@
-# GitHub Actions专用Dockerfile - 优化构建性能
+# GitHub Actions简化版Dockerfile - 专门解决gradlew权限问题
 FROM eclipse-temurin:17-jdk-jammy AS builder
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装基本工具（最小化）
+# 安装基本工具
 RUN apt-get update && apt-get install -y \
   unzip \
   curl \
   dos2unix \
   && rm -rf /var/lib/apt/lists/*
 
-# 设置Gradle环境变量（GitHub Actions优化）
-ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m"
+# 设置Gradle环境变量
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs=-Xmx2g"
 
 # 复制gradle配置文件
 COPY gradle.properties ./
@@ -21,23 +21,21 @@ COPY gradle ./gradle
 COPY build.gradle ./
 COPY settings.gradle ./
 
-# 增强gradlew权限修复
-RUN echo "=== 修复前状态 ===" && \
-    ls -la gradlew && \
-    echo "=== 修复权限 ===" && \
-    chmod +x ./gradlew && \
-    echo "=== 修复换行符 ===" && \
-    dos2unix ./gradlew 2>/dev/null || true && \
-    echo "=== 修复后状态 ===" && \
-    ls -la gradlew && \
-    echo "=== 测试执行 ===" && \
-    ./gradlew --version
+# 强制修复gradlew权限和换行符
+RUN echo "=== 开始修复gradlew ===" && \
+  ls -la gradlew && \
+  chmod +x ./gradlew && \
+  dos2unix ./gradlew && \
+  ls -la gradlew && \
+  echo "=== 测试gradlew ===" && \
+  ./gradlew --version && \
+  echo "=== 修复完成 ==="
 
 # 复制源代码
 COPY . .
 
-# 构建SonarQube（使用保守设置）
-RUN ./gradlew :sonar-application:zip --no-daemon --parallel=false --max-workers=1 --info
+# 构建SonarQube
+RUN ./gradlew :sonar-application:zip --no-daemon --parallel=false --max-workers=1
 
 # 创建运行时镜像
 FROM eclipse-temurin:17-jre-jammy

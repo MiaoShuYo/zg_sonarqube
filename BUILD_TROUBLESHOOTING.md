@@ -82,6 +82,11 @@ docker build -f Dockerfile.test -t sonarqube-test .
 docker build -f Dockerfile.minimal -t sonarqube-minimal .
 ```
 
+#### 方案E：使用GitHub Actions专用Dockerfile
+```bash
+docker build -f Dockerfile.github-actions-simple -t sonarqube-ga .
+```
+
 ### 3. 退出代码127 - 命令未找到
 
 **错误信息：**
@@ -226,10 +231,13 @@ A:
 - `Dockerfile.simple` - 简化版构建文件
 - `Dockerfile.minimal` - 最小化构建文件
 - `Dockerfile.github-actions` - GitHub Actions专用构建文件
+- `Dockerfile.github-actions-simple` - GitHub Actions简化版构建文件
 - `Dockerfile.test` - 测试诊断文件
 - `scripts/build-debug.sh` - 调试脚本
 - `scripts/fix-gradlew.sh` - gradlew修复脚本
 - `scripts/quick-fix.sh` - 快速修复脚本
+- `scripts/github-actions-fix.sh` - GitHub Actions修复脚本
+- `scripts/test-github-actions.sh` - GitHub Actions测试脚本
 - `gradle.properties` - Gradle配置
 - `.github/workflows/ci.yml` - CI工作流
 - `GITHUB_ACTIONS_BUILD.md` - GitHub Actions构建指南
