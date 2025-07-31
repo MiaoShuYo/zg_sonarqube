@@ -1,0 +1,68 @@
+# 使用多阶段构建
+FROM eclipse-temurin:17-jdk-jammy AS builder
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装必要的构建工具
+RUN apt-get update && apt-get install -y \
+    unzip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制项目文件
+COPY . .
+
+# 构建SonarQube完整发行版
+RUN ./gradlew :sonar-application:zip
+
+# 创建运行时镜像
+FROM eclipse-temurin:17-jre-jammy
+
+# 创建sonarqube用户和组
+RUN groupadd -r sonarqube && useradd -r -g sonarqube sonarqube
+
+# 设置环境变量
+ENV SONARQUBE_HOME=/opt/sonarqube \
+    SONAR_VERSION=latest \
+    SQ_DATA_DIR="/opt/sonarqube/data" \
+    SQ_LOGS_DIR="/opt/sonarqube/logs" \
+    SQ_TEMP_DIR="/opt/sonarqube/temp" \
+    SQ_CONF_DIR="/opt/sonarqube/conf" \
+    SQ_EXTENSIONS_DIR="/opt/sonarqube/extensions"
+
+# 创建必要的目录
+RUN mkdir -p "$SONARQUBE_HOME" \
+    && mkdir -p "$SQ_DATA_DIR" \
+    && mkdir -p "$SQ_LOGS_DIR" \
+    && mkdir -p "$SQ_TEMP_DIR" \
+    && mkdir -p "$SQ_CONF_DIR" \
+    && mkdir -p "$SQ_EXTENSIONS_DIR"
+
+# 从构建阶段复制构建的发行版
+COPY --from=builder /app/sonar-application/build/distributions/sonar-application-*.zip /tmp/sonarqube.zip
+
+# 解压发行版
+RUN unzip /tmp/sonarqube.zip -d /tmp \
+    && mv /tmp/sonar-application-*/* "$SONARQUBE_HOME/" \
+    && rm -rf /tmp/sonar-application-* /tmp/sonarqube.zip
+
+# 设置权限
+RUN chown -R sonarqube:sonarqube "$SONARQUBE_HOME" \
+    && chmod +x "$SONARQUBE_HOME/bin/"*
+
+# 切换到sonarqube用户
+USER sonarqube
+
+# 暴露端口
+EXPOSE 9000
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5m --retries=3 \
+    CMD curl -f http://localhost:9000/api/system/status || exit 1
+
+# 设置工作目录
+WORKDIR "$SONARQUBE_HOME"
+
+# 启动命令
+CMD ["bin/linux-x86-64/sonar.sh", "console"] 
