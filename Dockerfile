@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 # 复制项目文件
 COPY . .
 
+# 确保gradlew有执行权限
+RUN chmod +x ./gradlew
+
 # 构建SonarQube完整发行版
 RUN ./gradlew :sonar-application:zip
 
