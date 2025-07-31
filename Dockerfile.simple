@@ -1,4 +1,4 @@
-# 使用多阶段构建
+# 简化版Dockerfile用于测试构建
 FROM eclipse-temurin:17-jdk-jammy AS builder
 
 # 设置工作目录
@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置Gradle环境变量
-ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g"
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs=-Xmx2g"
 
 # 复制gradle配置文件
 COPY gradle.properties ./
@@ -23,14 +23,14 @@ COPY settings.gradle ./
 # 确保gradlew有执行权限
 RUN chmod +x ./gradlew
 
-# 预热Gradle缓存
+# 测试Gradle是否正常工作
 RUN ./gradlew --version
 
 # 复制源代码
 COPY . .
 
-# 构建SonarQube完整发行版
-RUN ./gradlew :sonar-application:zip --no-daemon --parallel --max-workers=2
+# 尝试构建（使用更保守的设置）
+RUN ./gradlew :sonar-application:zip --no-daemon --parallel=false --max-workers=1 --info
 
 # 创建运行时镜像
 FROM eclipse-temurin:17-jre-jammy
