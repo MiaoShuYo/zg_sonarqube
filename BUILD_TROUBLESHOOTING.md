@@ -77,6 +77,48 @@ RUN chmod +x ./gradlew && \
 docker build -f Dockerfile.test -t sonarqube-test .
 ```
 
+#### 方案D：使用最小化Dockerfile
+```bash
+docker build -f Dockerfile.minimal -t sonarqube-minimal .
+```
+
+### 3. 退出代码127 - 命令未找到
+
+**错误信息：**
+```
+exit code: 127
+```
+
+**可能原因：**
+- 命令不存在于容器中
+- 工具未安装
+- 路径问题
+
+**解决方案：**
+
+#### 方案A：安装缺失的工具
+```dockerfile
+# 安装必要的工具
+RUN apt-get update && apt-get install -y \
+    unzip \
+    curl \
+    dos2unix \
+    file \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+#### 方案B：使用最小化Dockerfile
+```bash
+docker build -f Dockerfile.minimal -t sonarqube .
+```
+
+#### 方案C：简化命令
+```dockerfile
+# 避免使用可能不存在的命令
+RUN chmod +x ./gradlew && \
+    ls -la ./gradlew
+```
+
 ### 3. 网络超时问题
 
 **解决方案：**
@@ -182,9 +224,15 @@ A:
 
 - `Dockerfile` - 主构建文件
 - `Dockerfile.simple` - 简化版构建文件
+- `Dockerfile.minimal` - 最小化构建文件
+- `Dockerfile.github-actions` - GitHub Actions专用构建文件
+- `Dockerfile.test` - 测试诊断文件
 - `scripts/build-debug.sh` - 调试脚本
+- `scripts/fix-gradlew.sh` - gradlew修复脚本
+- `scripts/quick-fix.sh` - 快速修复脚本
 - `gradle.properties` - Gradle配置
 - `.github/workflows/ci.yml` - CI工作流
+- `GITHUB_ACTIONS_BUILD.md` - GitHub Actions构建指南
 
 ## 获取帮助
 

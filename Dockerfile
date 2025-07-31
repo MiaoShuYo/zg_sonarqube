@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     dos2unix \
+    file \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置Gradle环境变量
@@ -24,7 +25,7 @@ COPY settings.gradle ./
 # 修复gradlew权限和换行符问题
 RUN chmod +x ./gradlew && \
     dos2unix ./gradlew 2>/dev/null || true && \
-    file ./gradlew
+    ls -la ./gradlew
 
 # 预热Gradle缓存
 RUN ./gradlew --version

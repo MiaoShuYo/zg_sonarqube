@@ -1,15 +1,13 @@
-# 简化版Dockerfile用于测试构建
+# 最小化Dockerfile - 避免复杂命令
 FROM eclipse-temurin:17-jdk-jammy AS builder
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装必要的构建工具
+# 安装基本工具
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
-    dos2unix \
-    file \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置Gradle环境变量
@@ -22,19 +20,17 @@ COPY gradle ./gradle
 COPY build.gradle ./
 COPY settings.gradle ./
 
-# 修复gradlew权限和换行符问题
-RUN chmod +x ./gradlew && \
-    dos2unix ./gradlew 2>/dev/null || true && \
-    ls -la ./gradlew
+# 简单修复gradlew权限
+RUN chmod +x ./gradlew
 
-# 测试Gradle是否正常工作
+# 测试Gradle
 RUN ./gradlew --version
 
 # 复制源代码
 COPY . .
 
-# 尝试构建（使用更保守的设置）
-RUN ./gradlew :sonar-application:zip --no-daemon --parallel=false --max-workers=1 --info
+# 构建
+RUN ./gradlew :sonar-application:zip --no-daemon --parallel=false --max-workers=1
 
 # 创建运行时镜像
 FROM eclipse-temurin:17-jre-jammy
