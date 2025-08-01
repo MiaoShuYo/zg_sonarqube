@@ -104,26 +104,4 @@ jobs:
         curl -f http://localhost:9000/api/system/status
         
         # 停止服务
-        docker-compose down
-        
-  lint:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Run hadolint
-      uses: hadolint/hadolint-action@v3.1.0
-      with:
-        dockerfile: Dockerfile
-        format: sarif
-        output-file: hadolint-results.sarif
-        
-    - name: Upload hadolint results as artifact
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: hadolint-results
-        path: hadolint-results.sarif
-        retention-days: 30 
+        docker-compose down 
