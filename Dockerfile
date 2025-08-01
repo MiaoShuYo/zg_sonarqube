@@ -32,16 +32,16 @@ RUN ./gradlew :sonar-application:shadowJar :sonar-core:jar :sonar-plugin-api-imp
 RUN ls -la sonar-application/build/libs/ || echo "Build directory not found"
 
 # 创建运行时目录结构
-RUN mkdir -p /opt/sonarqube/{bin/linux-x86-64,conf,lib,logs,data,extensions,temp,elasticsearch}
+RUN mkdir -p /opt/sonarqube/bin/linux-x86-64 /opt/sonarqube/conf /opt/sonarqube/lib /opt/sonarqube/logs /opt/sonarqube/data /opt/sonarqube/extensions /opt/sonarqube/temp /opt/sonarqube/elasticsearch
 
 # 复制JAR文件到lib目录
 RUN cp sonar-application/build/libs/*.jar /opt/sonarqube/lib/
 
 # 创建启动脚本
 RUN echo '#!/bin/bash\n\
-cd /opt/sonarqube\n\
-java -jar lib/sonar-application.jar\n\
-' > /opt/sonarqube/bin/linux-x86-64/sonar.sh && \
+    cd /opt/sonarqube\n\
+    java -jar lib/sonar-application.jar\n\
+    ' > /opt/sonarqube/bin/linux-x86-64/sonar.sh && \
     chmod +x /opt/sonarqube/bin/linux-x86-64/sonar.sh
 
 # 设置环境变量
