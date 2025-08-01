@@ -26,7 +26,11 @@ COPY . .
 RUN chmod +x gradlew
 
 # 构建SonarQube应用
-RUN ./gradlew :sonar-application:shadowJar --no-daemon
+RUN ./gradlew :sonar-application:shadowJar --no-daemon --info
+
+# 验证构建结果
+RUN ls -la sonar-application/build/libs/ || echo "Build directory not found"
+RUN find . -name "*.jar" -type f || echo "No JAR files found"
 
 # 创建运行时目录
 RUN mkdir -p /opt/sonarqube/logs /opt/sonarqube/data /opt/sonarqube/extensions /opt/sonarqube/temp
@@ -45,5 +49,5 @@ EXPOSE 9000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:9000/api/system/status || exit 1
 
-# 启动命令
-CMD ["java", "-jar", "sonar-application/build/libs/sonar-application.jar"] 
+# 启动命令 - 使用更灵活的方式查找JAR文件
+CMD ["sh", "-c", "java -jar $(find sonar-application/build/libs -name '*.jar' | head -1)"] 
