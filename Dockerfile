@@ -34,14 +34,17 @@ RUN ls -la sonar-application/build/libs/ || echo "Build directory not found"
 # 创建运行时目录结构
 RUN mkdir -p /opt/sonarqube/bin/linux-x86-64 /opt/sonarqube/conf /opt/sonarqube/lib /opt/sonarqube/logs /opt/sonarqube/data /opt/sonarqube/extensions /opt/sonarqube/temp /opt/sonarqube/elasticsearch
 
-# 复制JAR文件到lib目录
-RUN cp sonar-application/build/libs/*.jar /opt/sonarqube/lib/
+# 复制JAR文件到lib目录并重命名
+RUN cp sonar-application/build/libs/*.jar /opt/sonarqube/lib/sonar-application.jar
+
+# 验证JAR文件
+RUN ls -la /opt/sonarqube/lib/ || echo "Lib directory not found"
 
 # 创建启动脚本
 RUN echo '#!/bin/bash\n\
-    cd /opt/sonarqube\n\
-    java -jar lib/sonar-application.jar\n\
-    ' > /opt/sonarqube/bin/linux-x86-64/sonar.sh && \
+cd /opt/sonarqube\n\
+java -jar lib/sonar-application.jar\n\
+' > /opt/sonarqube/bin/linux-x86-64/sonar.sh && \
     chmod +x /opt/sonarqube/bin/linux-x86-64/sonar.sh
 
 # 设置环境变量
@@ -58,5 +61,5 @@ EXPOSE 9000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:9000/api/system/status || exit 1
 
-# 启动命令 - 直接运行JAR文件
-CMD ["java", "-jar", "/opt/sonarqube/lib/sonar-application.jar"] 
+# 启动命令 - 使用启动脚本
+CMD ["/opt/sonarqube/bin/linux-x86-64/sonar.sh"] 
