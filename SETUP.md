@@ -10,12 +10,12 @@
 4. 点击 "New repository secret" 按钮
 5. 添加以下两个Secrets：
 
-#### DOCKER_USERNAME
-- **Name**: `DOCKER_USERNAME`
+#### DOCKERHUB_USERNAME
+- **Name**: `DOCKERHUB_USERNAME`
 - **Value**: 您的Docker Hub用户名
 
-#### DOCKER_PASSWORD
-- **Name**: `DOCKER_PASSWORD`
+#### DOCKERHUB_PASSWORD
+- **Name**: `DOCKERHUB_PASSWORD`
 - **Value**: 您的Docker Hub密码或访问令牌
 
 > **注意**: 建议使用Docker Hub访问令牌而不是密码，更安全。
@@ -28,9 +28,18 @@
 4. 点击 "New Access Token"
 5. 输入令牌名称（如：github-actions）
 6. 复制生成的令牌
-7. 在GitHub Secrets中使用这个令牌作为 `DOCKER_PASSWORD`
+7. 在GitHub Secrets中使用这个令牌作为 `DOCKERHUB_PASSWORD`
 
-### 3. 触发构建
+### 3. 验证Secrets配置
+
+确保您的GitHub Secrets包含以下内容：
+
+| Secret名称 | 描述 | 必需 |
+|-----------|------|------|
+| `DOCKERHUB_USERNAME` | Docker Hub用户名 | 是 |
+| `DOCKERHUB_PASSWORD` | Docker Hub密码或访问令牌 | 是 |
+
+### 4. 触发构建
 
 推送代码到main分支即可自动触发构建：
 
@@ -60,14 +69,26 @@ git push origin main
 
 ### 常见问题
 
-#### 1. 权限错误
-确保已正确设置 `DOCKER_USERNAME` 和 `DOCKER_PASSWORD` Secrets。
+#### 1. "Username and password required" 错误
+**原因**: Secrets未正确配置
+**解决方案**: 
+- 检查 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD` 是否已设置
+- 确保Secrets名称拼写正确（注意大小写）
+- 验证Docker Hub凭据是否有效
 
-#### 2. 构建失败
-检查Dockerfile语法和依赖项。
+#### 2. 权限错误
+**原因**: Docker Hub账户权限不足
+**解决方案**:
+- 确保Docker Hub账户有推送权限
+- 检查仓库名称是否正确
+- 验证访问令牌是否有效
 
-#### 3. 推送失败
-确保Docker Hub账户有足够的权限。
+#### 3. 构建失败
+**原因**: Dockerfile语法错误或依赖问题
+**解决方案**:
+- 检查Dockerfile语法
+- 验证构建上下文
+- 查看详细错误日志
 
 ### 查看日志
 1. 进入GitHub仓库
@@ -95,4 +116,18 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
-``` 
+```
+
+## 测试Secrets配置
+
+您可以通过以下方式测试Secrets是否正确配置：
+
+1. **手动触发工作流**:
+   - 进入GitHub仓库的Actions页面
+   - 选择 "Build and Push Docker Image" 工作流
+   - 点击 "Run workflow" 按钮
+   - 选择main分支并运行
+
+2. **检查日志**:
+   - 如果看到 "Log in to Docker Hub" 步骤成功，说明Secrets配置正确
+   - 如果看到 "Username and password required" 错误，需要检查Secrets配置 

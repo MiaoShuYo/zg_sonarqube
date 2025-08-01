@@ -56,14 +56,20 @@ volumes:
 ### 必需的Secrets
 在GitHub仓库设置中添加以下Secrets：
 
-1. **DOCKER_USERNAME**: 您的Docker Hub用户名
-2. **DOCKER_PASSWORD**: 您的Docker Hub密码或访问令牌
+1. **DOCKERHUB_USERNAME**: 您的Docker Hub用户名
+2. **DOCKERHUB_PASSWORD**: 您的Docker Hub密码或访问令牌
 
 ### 设置步骤
 1. 进入GitHub仓库设置
 2. 点击 "Secrets and variables" → "Actions"
 3. 添加上述两个Secrets
 4. 推送代码到main分支即可触发自动构建
+
+### 故障排除
+如果遇到 "Username and password required" 错误：
+- 检查 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD` 是否已正确设置
+- 确保Secrets名称拼写正确（注意大小写）
+- 验证Docker Hub凭据是否有效
 
 ## 📋 使用方法
 
