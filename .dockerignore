@@ -12,6 +12,10 @@ build/
 !gradlew.bat
 !gradle/
 
+# 保留构建输出
+!sonar-application/build/distributions/
+!sonar-application/build/libs/
+
 # IDE相关
 .idea
 .vscode
