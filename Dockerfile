@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
 
 # 设置Gradle环境变量
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g"
+ENV JAVA_OPTS="-Xmx4g -XX:MaxMetaspaceSize=1g"
 
 # 复制gradle配置文件
 COPY gradle.properties ./
@@ -33,8 +34,12 @@ RUN ./gradlew --version
 # 复制源代码
 COPY . .
 
+# 重新设置gradlew权限（防止在复制过程中丢失）
+RUN chmod +x ./gradlew && \
+    ls -la ./gradlew
+
 # 构建SonarQube完整发行版
-RUN ./gradlew :sonar-application:zip --no-daemon --parallel --max-workers=2
+RUN ./gradlew :sonar-application:zip --no-daemon --parallel --max-workers=2 --stacktrace
 
 # 创建运行时镜像
 FROM eclipse-temurin:17-jre-jammy

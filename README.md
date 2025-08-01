@@ -1,125 +1,147 @@
-# SonarQube [![Build Status](https://api.cirrus-ci.com/github/SonarSource/sonarqube.svg?branch=master)](https://cirrus-ci.com/github/SonarSource/sonarqube) [![Quality Gate Status](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=sonarqube&metric=alert_status&token=d95182127dd5583f57578d769b511660601a8547)](https://next.sonarqube.com/sonarqube/dashboard?id=sonarqube) [![AI Code Assurance](https://next.sonarqube.com/sonarqube/api/project_badges/ai_code_assurance?project=org.sonarsource.sonarqube%3Asonarqube-private&token=sqb_c0e2fa9ac4ef89f9a8403c6ba235e108ceb1dce1)](https://next.sonarqube.com/sonarqube/dashboard?id=sonarqube)
+# SonarQube Community Edition with Branch Support
 
-## Continuous Inspection
+这是一个修改版的SonarQube Community Edition，移除了对分支功能的限制，允许Community Edition支持非main分支和Pull Request的分析。
 
-SonarQube provides the capability to not only show the health of an application but also to highlight issues newly introduced. With a Quality Gate in place, you can [achieve Clean Code](https://www.sonarsource.com/solutions/clean-code/) and therefore improve code quality systematically.
+## 🚀 主要改进
 
-## Links
+### 分支支持
+- ✅ **非main分支分析**：支持分析任意分支
+- ✅ **Pull Request分析**：支持分析Pull Request
+- ✅ **分支功能**：移除了Community Edition的分支限制
 
-- [Website](https://www.sonarsource.com/products/sonarqube)
-- [Download](https://www.sonarsource.com/products/sonarqube/downloads)
-- [Documentation](https://docs.sonarsource.com/sonarqube)
-- [Webapp source code](https://github.com/SonarSource/sonarqube-webapp)
-- [X](https://twitter.com/SonarQube)
-- [SonarSource](https://www.sonarsource.com), author of SonarQube
-- [Issue tracking](https://jira.sonarsource.com/browse/SONAR/), read-only. Only SonarSourcers can create tickets.
-- [Responsible Disclosure](https://community.sonarsource.com/t/responsible-vulnerability-disclosure/9317)
-- [Next](https://next.sonarqube.com/sonarqube) instance of the next SonarQube version
+### 修改内容
+1. **AnalysisMetadataHolderImpl.java** - 移除了版本检查逻辑
+2. **BranchLoader.java** - 添加了分支支持
+3. **CommunityBranchImpl.java** - 新增的分支实现类
+4. **ProjectReactorValidator.java** - 移除了扫描器端限制
+5. **ScanProperties.java** - 移除了属性验证限制
 
-## Have Questions or Feedback?
+## 📦 Docker镜像
 
-For support questions ("How do I?", "I got this error, why?", ...), please first read the [documentation](https://docs.sonarsource.com/sonarqube) and then head to the [SonarSource Community](https://community.sonarsource.com/c/help/sq/10). The answer to your question has likely already been answered! 🤓
-
-Be aware that this forum is a community, so the standard pleasantries ("Hi", "Thanks", ...) are expected. And if you don't get an answer to your thread, you should sit on your hands for at least three days before bumping it. Operators are not standing by. 😄
-
-## Contributing
-
-If you would like to see a new feature or report a bug, please create a new thread in our [forum](https://community.sonarsource.com/c/sq/10).
-
-Please be aware that we are not actively looking for feature contributions. The truth is that it's extremely difficult for someone outside SonarSource to comply with our roadmap and expectations. Therefore, we typically only accept minor cosmetic changes and typo fixes.
-
-With that in mind, if you would like to submit a code contribution, please create a pull request for this repository. Please explain your motives to contribute this change: what problem you are trying to fix, what improvement you are trying to make.
-
-Make sure that you follow our [code style](https://github.com/SonarSource/sonar-developer-toolset#code-style) and all tests are passing (Travis build is executed for each pull request).
-
-Willing to contribute to SonarSource products? We are looking for smart, passionate, and skilled people to help us build world-class code-quality solutions. Have a look at our current [job offers here](https://www.sonarsource.com/company/jobs/)!
-
-## Building
-
-To build sources locally follow these instructions.
-
-### Build and Run Unit Tests
-
-Execute from the project base directory:
-
-    ./gradlew build
-
-The zip distribution file is generated in `sonar-application/build/distributions/`. Unzip it and start the server by executing:
-
-    # on Linux
-    bin/linux-x86-64/sonar.sh start
-    # or on MacOS
-    bin/macosx-universal-64/sonar.sh start
-    # or on Windows
-    bin\windows-x86-64\StartSonar.bat
-
-### Open in IDE
-
-If the project has never been built, then build it as usual (see previous section) or use the quicker command:
-
-    ./gradlew ide
-
-Then open the root file `build.gradle` as a project in IntelliJ or Eclipse.
-
-### Gradle Hints
-
-| ./gradlew command                | Description                               |
-| -------------------------------- | ----------------------------------------- |
-| `dependencies`                   | list dependencies                         |
-| `licenseFormat --rerun-tasks`    | fix source headers by applying HEADER.txt |
-| `wrapper --gradle-version 5.2.1` | upgrade wrapper                           |
-
-## Building with UI changes
-
-The SonarQube UI (or webapp as we call it), is located in another repository: [sonarqube-webapp](https://github.com/SonarSource/sonarqube-webapp).
-
-When building the `sonarqube` repository, the webapp is automatically downloaded from Maven Central as a dependency, it makes it easy for you to contribute backend changes without having to care about the webapp.
-
-But if your contribution also contains UI changes, you must clone the `sonarqube-webapp` repository, do your changes there, build it locally and then build the `sonarqube` repository using the `WEBAPP_BUILD_PATH` environment variable to target your custom build of the UI.
-
-Here is an example of how to do it:
-
+### 构建镜像
 ```bash
-cd /path/to/sonarqube-webapp/server/sonar-web
-# do your changes
-
-# install dependencies, only needed the first time
-yarn
-
-# build the webapp
-yarn build
-
-
-cd /path/to/sonarqube
-
-# build the sonarqube repository using the custom build of the webapp
-WEBAPP_BUILD_PATH=/path/to/sonarqube-webapp/server/sonar-web/build/webapp ./gradlew build
+docker build -t zgsonarqube:latest .
 ```
 
-You can also target a specific version of the webapp by updating the `webappVersion` property in the `./gradle.properties` file and then building the `sonarqube` repository normally.
-
-## Translations files
-
-Historically our translations were stored in `sonar-core/src/main/resources/org/sonar/l10n/core.properties`, but this file is now deprecated and not updated anymore.
-Default translations (in English) are now defined in the webapp repository, here:
-https://github.com/SonarSource/sonarqube-webapp/blob/master/libs/sq-server-shared/src/l10n/default.ts
-
-The format has changed but you can still have it as a `.properties` file format by running the following command:
-
+### 运行容器
 ```bash
-cd /path/to/sonarqube-webapp/server/sonar-web
-
-# install dependencies, only needed the first time
-yarn
-
-# generate a backward compatible .properties file with all the translation keys
-yarn generate-translation-keys
+docker run -d \
+  --name sonarqube \
+  -p 9000:9000 \
+  -v sonarqube_data:/opt/sonarqube/data \
+  -v sonarqube_logs:/opt/sonarqube/logs \
+  -v sonarqube_extensions:/opt/sonarqube/extensions \
+  zgsonarqube:latest
 ```
 
-Note that contributing extensions for translations into other languages still work the same way as before. It's just the source of truth for the default translations that changed.
+### 使用Docker Compose
+```yaml
+version: '3.8'
+services:
+  sonarqube:
+    image: zgsonarqube:latest
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
 
-## License
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+```
 
-Copyright 2008-2025 SonarSource.
+## 🔧 使用方法
 
-Licensed under the [GNU Lesser General Public License, Version 3.0](https://www.gnu.org/licenses/lgpl.txt)
+### 分支分析
+```bash
+sonar-scanner \
+  -Dsonar.branch.name=feature-branch \
+  -Dsonar.projectKey=my-project \
+  -Dsonar.sources=src \
+  -Dsonar.host.url=http://localhost:9000
+```
+
+### Pull Request分析
+```bash
+sonar-scanner \
+  -Dsonar.pullrequest.key=123 \
+  -Dsonar.pullrequest.branch=feature-branch \
+  -Dsonar.pullrequest.base=main \
+  -Dsonar.projectKey=my-project \
+  -Dsonar.sources=src \
+  -Dsonar.host.url=http://localhost:9000
+```
+
+### GitHub Actions集成
+```yaml
+name: SonarQube Analysis
+on: [push, pull_request]
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: SonarQube Scan
+      uses: sonarqube-quality-gate-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.branch.name=${{ github.head_ref }}
+          -Dsonar.pullrequest.key=${{ github.event.number }}
+          -Dsonar.pullrequest.branch=${{ github.head_ref }}
+          -Dsonar.pullrequest.base=${{ github.base_ref }}
+```
+
+## 🛠️ 开发环境
+
+### 本地构建
+```bash
+# 设置Java 17+
+export JAVA_HOME=/path/to/java17
+
+# 构建项目
+./gradlew :sonar-application:zip --no-daemon --parallel --max-workers=2
+```
+
+### 运行测试
+```bash
+# 运行所有测试
+./gradlew test
+
+# 运行特定模块测试
+./gradlew :server:sonar-ce-task-projectanalysis:test
+```
+
+## 📋 注意事项
+
+1. **功能限制**：虽然移除了版本检查，但某些高级分支功能可能仍然不可用
+2. **数据库兼容性**：确保数据库结构支持分支功能
+3. **插件依赖**：某些分支相关功能可能仍需要特定的插件支持
+4. **测试覆盖**：建议在部署前进行充分测试
+
+## 🔒 免责声明
+
+这些修改移除了SonarQube的商业限制，仅用于学习和研究目的。在生产环境中使用前，请确保符合相关的许可证条款。
+
+## 📄 许可证
+
+本项目基于LGPL-3.0许可证发布。详见[LICENSE](LICENSE)文件。
+
+## 🤝 贡献
+
+欢迎提交Issue和Pull Request来改进这个项目。
+
+## 📞 支持
+
+如果您遇到问题或有建议，请创建Issue或联系维护者。

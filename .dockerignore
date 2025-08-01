@@ -1,51 +1,58 @@
-# 排除所有文件
-*
-# 只包含必要的文件
-!gradle/
-!gradlew
-!gradlew.bat
-!build.gradle
-!settings.gradle
-!gradle.properties
-!sonar-application/
-!server/
-!sonar-core/
-!sonar-plugin-api-impl/
-!sonar-scanner-engine/
-!sonar-scanner-engine-shaded/
-!sonar-scanner-protocol/
-!sonar-shutdowner/
-!sonar-ws/
-!sonar-ws-generator/
-!sonar-testing-harness/
-!sonar-testing-ldap/
-!sonar-duplications/
-!sonar-markdown/
-!sonar-sarif/
-!plugins/
-!buildSrc/
-!docs/
-!scripts/
-!.cirrus/
-!Dockerfile
-!.dockerignore
-!BRANCH_SUPPORT_MODIFICATIONS.md
-!README.md
-!LICENSE
-!COPYING
+# Git相关文件
+.git
+.gitignore
+.gitattributes
 
-# 排除构建产物和临时文件
-**/build/
-**/target/
-**/.gradle/
-**/node_modules/
-**/.git/
-**/.gitignore
-**/.idea/
-**/.vscode/
-**/*.log
-**/logs/
-**/temp/
-**/data/
-**/sonarqube-*/
-**/sonar-application-*/
+# IDE相关文件
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+
+# 构建输出
+build/
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 文档文件
+*.md
+docs/
+
+# 测试文件
+test-resources/
+**/test/
+**/tests/
+
+# 其他
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker相关
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD相关
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# 备份文件
+*.bak
+*.backup
