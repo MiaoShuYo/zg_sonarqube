@@ -8,7 +8,7 @@ on:
     branches: [ main, master ]
 
 env:
-  REGISTRY: programercat
+  REGISTRY: docker.io
   IMAGE_NAME: zgSonarQube
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: programercat/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
