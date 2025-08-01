@@ -69,21 +69,29 @@ git push origin main
 
 ### 常见问题
 
-#### 1. "Username and password required" 错误
+#### 1. "Password required" 错误
+**原因**: Secrets未正确配置或名称错误
+**解决方案**: 
+- 检查 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD` 是否已设置
+- 确保Secrets名称拼写正确（注意大小写）
+- 验证Docker Hub凭据是否有效
+- 确保使用的是 `DOCKERHUB_PASSWORD` 而不是 `DOCKERHUB_TOKEN`
+
+#### 2. "Username and password required" 错误
 **原因**: Secrets未正确配置
 **解决方案**: 
 - 检查 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD` 是否已设置
 - 确保Secrets名称拼写正确（注意大小写）
 - 验证Docker Hub凭据是否有效
 
-#### 2. 权限错误
+#### 3. 权限错误
 **原因**: Docker Hub账户权限不足
 **解决方案**:
 - 确保Docker Hub账户有推送权限
 - 检查仓库名称是否正确
 - 验证访问令牌是否有效
 
-#### 3. 构建失败
+#### 4. 构建失败
 **原因**: Dockerfile语法错误或依赖问题
 **解决方案**:
 - 检查Dockerfile语法
@@ -130,4 +138,8 @@ on:
 
 2. **检查日志**:
    - 如果看到 "Log in to Docker Hub" 步骤成功，说明Secrets配置正确
-   - 如果看到 "Username and password required" 错误，需要检查Secrets配置 
+   - 如果看到 "Password required" 或 "Username and password required" 错误，需要检查Secrets配置
+
+3. **验证Secrets名称**:
+   - 确保使用的是 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD`
+   - 不要使用 `DOCKER_USERNAME`、`DOCKER_PASSWORD` 或 `DOCKERHUB_TOKEN` 
