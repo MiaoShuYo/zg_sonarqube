@@ -1,0 +1,48 @@
+# Git相关
+.git
+.gitignore
+
+# Gradle相关
+.gradle
+build/
+!build.gradle
+!settings.gradle
+!gradle.properties
+!gradlew
+!gradlew.bat
+!gradle/
+
+# IDE相关
+.idea
+.vscode
+*.iml
+
+# 操作系统相关
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 测试相关
+**/test/
+**/tests/
+**/testing/
+
+# 文档
+*.md
+docs/
+
+# CI/CD相关
+.github/
+.cirrus/
+.cirrus.star
+
+# 其他
+NOTICE.txt
+LICENSE.txt
+HEADER 
