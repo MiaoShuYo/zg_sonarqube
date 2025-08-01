@@ -25,24 +25,24 @@ COPY . .
 # 设置执行权限
 RUN chmod +x gradlew
 
-# 构建SonarQube应用和发行版
-RUN ./gradlew :sonar-application:shadowJar :sonar-application:zip --no-daemon --info
+# 构建SonarQube应用（跳过测试和问题模块）
+RUN ./gradlew :sonar-application:shadowJar :sonar-core:jar :sonar-plugin-api-impl:jar --no-daemon --info -x test -x :sonar-scanner-engine:compileJava
 
 # 验证构建结果
 RUN ls -la sonar-application/build/libs/ || echo "Build directory not found"
-RUN ls -la sonar-application/build/distributions/ || echo "Distributions directory not found"
 
-# 解压SonarQube发行版
-RUN cd sonar-application/build/distributions && \
-    unzip -q *.zip && \
-    mv sonar-* /opt/sonarqube-runtime
+# 创建运行时目录结构
+RUN mkdir -p /opt/sonarqube/{bin/linux-x86-64,conf,lib,logs,data,extensions,temp,elasticsearch}
 
-# 创建运行时目录
-RUN mkdir -p /opt/sonarqube/logs /opt/sonarqube/data /opt/sonarqube/extensions /opt/sonarqube/temp
+# 复制JAR文件到lib目录
+RUN cp sonar-application/build/libs/*.jar /opt/sonarqube/lib/
 
-# 复制运行时文件
-RUN cp -r /opt/sonarqube-runtime/* /opt/sonarqube/ && \
-    rm -rf /opt/sonarqube-runtime
+# 创建启动脚本
+RUN echo '#!/bin/bash\n\
+cd /opt/sonarqube\n\
+java -jar lib/sonar-application.jar\n\
+' > /opt/sonarqube/bin/linux-x86-64/sonar.sh && \
+    chmod +x /opt/sonarqube/bin/linux-x86-64/sonar.sh
 
 # 设置环境变量
 ENV SONAR_HOME=/opt/sonarqube
@@ -58,5 +58,5 @@ EXPOSE 9000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:9000/api/system/status || exit 1
 
-# 启动命令 - 使用SonarQube的标准启动脚本
-CMD ["/opt/sonarqube/bin/linux-x86-64/sonar.sh", "start", "-f"] 
+# 启动命令 - 直接运行JAR文件
+CMD ["java", "-jar", "/opt/sonarqube/lib/sonar-application.jar"] 
